@@ -1105,6 +1105,12 @@ function toggleExoticJewelElement() {
 }
 
 function toggleIgnition(input) {
-  useFire = input.checkedFire
-  usePlasma = input.checkedPlasma
+  useFire = false
+  usePlasma = false
+
+  if (input == "fire") {
+    useFire = true
+  } else if (input == "plasma") {
+    usePlasma = true
+  }
 }

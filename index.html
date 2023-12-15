@@ -33,12 +33,12 @@
       <div id="filter-list">
         <div>
           <label for="use-sunken">Use Sunken</label>
-          <input id="use-sunken" name="use-sunken" type="checkbox" checked>
+          <input id="use-sunken" name="use-sunken" type="checkbox">
           <span></span>
         </div>
         <div>
           <label for="sunken-warrior">Use Sunken Warrior</label>
-          <input id="sunken-warrior" name="sunken-warrior" type="checkbox" checked>
+          <input id="sunken-warrior" name="sunken-warrior" type="checkbox">
           <span></span>
         </div>
         <div>
@@ -72,13 +72,13 @@
           <span></span>
         </div>
         <div>
-          <input id="fire-ignition" name="use-ignition" type="radio" onchange="toggleIgnition(this)" checkedFire>
+          <input id="fire-ignition" name="use-ignition" type="radio" onchange="toggleIgnition(this)" value="fire">
           <label for="fire-ignition">Ignite Gas with Fire</label>
           <br>
-          <input id="plasma-ignition" name="use-ignition" type="radio" onchange="toggleIgnition(this)" checkedPlasma>
+          <input id="plasma-ignition" name="use-ignition" type="radio" onchange="toggleIgnition(this)" value="plasma">
           <label for="plasma-ignition">Ignite Gas with Plasma</label>
           <br>
-          <input id="no-ignition" name="use-ignition" type="radio" onchange="toggleIgnition()">
+          <input id="no-ignition" name="use-ignition" type="radio" onchange="toggleIgnition(this)" checked>
           <label for="no-ignition">Don't Ignite Gas</label>
           <br>
           <span></span>
