@@ -121,7 +121,7 @@ class CustomSet {
 const MAX_LEVEL = 125;
 const BASE_HEALTH = 100 + 7 * (MAX_LEVEL - 1);
 const DAMAGE_AFFINITY = 0.75
-const BASE_ATTACK = DAMAGE_AFFINITY * (20 + (MAX_LEVEL - 1));
+const BASE_ATTACK = 20 + (MAX_LEVEL - 1);
 const HEALTH_PER_VIT = 4;
 
 // TODO: Figure out how gas damage scales with level (WoM used to just have `floor(level / 10) + 10` so level 90 had 19 damage)
@@ -363,8 +363,12 @@ function getDamageMultTuple(build) {
   let gasDamage = GAS_DAMAGE * (1 + 1 * usePlasma - 0.5 * useFire)
 
   // Should be average damage per second (Damage from Blast spells per second + Poisoned damage per second + Gas damage per second)
-  let defaultDamage = BASE_ATTACK * 0.5 + Math.floor(BASE_ATTACK * 0.05) + gasDamage
-  let actualDamage = (BASE_ATTACK + build.power()) * (0.5 * secondaryMult(build.speed())) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) + Math.floor((BASE_ATTACK + build.power()) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) * 0.05) + gasDamage
+  let defaultDamage = BASE_ATTACK * DAMAGE_AFFINITY * 0.5
+    + Math.floor(BASE_ATTACK * DAMAGE_AFFINITY * 0.05)
+    + gasDamage
+  let actualDamage = (BASE_ATTACK + build.power()) * DAMAGE_AFFINITY * (0.5 * secondaryMult(build.speed())) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500)
+    + Math.floor((BASE_ATTACK + build.power()) * DAMAGE_AFFINITY * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) * 0.05)
+    + gasDamage
   return [actualDamage, defaultDamage]
 }
 
@@ -377,7 +381,8 @@ function getHealthMultTuple(build) {
   // Aura's default cooldown of ~40 seconds is reduced with Intensity, but the Aura is always 25 seconds
   // The following should be the average health of the player over the total cooldown of Aura
   let defaultHealth = (BASE_HEALTH * (25 * RESISTANCE_AURA + 15)) / 40
-  let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense()) * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity())) + Math.max(40 / secondaryMult(build.intensity()) - 25, 0)) / Math.max(40 / secondaryMult(build.intensity()), 25)
+  let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense())
+    * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity())) + Math.max(40 / secondaryMult(build.intensity()) - 25, 0)) / Math.max(40 / secondaryMult(build.intensity()), 25)
   return [actualHealth, defaultHealth]
 }
 
