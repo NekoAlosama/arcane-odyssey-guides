@@ -342,15 +342,13 @@ function getFormattedMultiplierStr(mult) {
 // Effect interpolation for Attack Speed and Intensity
 // TODO: Measure Power Aura multiplier, since idk if it would be better for me or not
 function secondaryMult(stat) {
-  if (-0.5 < stat < 0.5) {
+  if (-0.5 < stat && stat < 0.5) {
     return 1
-  }
-  else if (0.5 < stat < 272.5) {
+  } else if (0.5 < stat && stat < 272.5) {
     return (2.24047567137 * (10 ** -5))
       * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582)
       + 9.88633994599 * 0.1
-  }
-  else {
+  } else {
     return 0
   }
 }
