@@ -348,7 +348,7 @@ function secondaryMult(stat) {
     return 2.24047567137 * 10 ** -5 * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582) + 9.88633994599 * 0.1
   }
   else {
-    return NaN
+    return 0
   }
 }
 
