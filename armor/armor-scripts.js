@@ -448,7 +448,7 @@ function getEffectiveDefense(build) {
 
 // Solver.py
 const Order = ["Amulet", "Accessory", "Boots", "Chestplate", "Enchant", "Helmet", "Jewel", "Modifier"];
-const StatOrder = ["power", "defense", "size", "intensity", "speed", "agility", "warding", "insanity", "drawback"];
+const StatOrder = ["power", "defense", "size", "intensity", "speed", "agility", "insanity", "warding", "drawback"];
 const MainStats = StatOrder.slice(0, 6);
 const Ratio = [1, 9, 3, 3, 3, 3, 1, 1, 1];
 let Armors;
