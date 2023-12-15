@@ -194,7 +194,7 @@ class Build {
     this.jewelSlots = armorList.reduce((sum, armor) => sum + armor.jewelSlots, 0);
     this.hash = getHash(this.stats);
     // this.statCode = getStatCode(stats);
-    this.multiplier = getMult(this) + getExtraTotalStats(this) / ((BASE_ATTACK / 0.75) / 2 + BASE_HEALTH / Ratio[1] / 2);
+    this.multiplier = getMult(this); // + getExtraTotalStats(this) / ((BASE_ATTACK / 0.75) / 2 + BASE_HEALTH / Ratio[1] / 2);
   }
 
   value() {
@@ -295,7 +295,9 @@ class Build {
   asHTML() {
     return `
       <div class="list-element">
-        <div title="Multiplier of all stats except Attack Size and Agility">Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</div>
+      <div title="Multiplier of all stats except Attack Size and Agility">Overall Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</div>
+      <div title="Multiplier of Vitality, Power, and Attack Speed">DPS/Original: ${getDamageMultTuple(this)}</div>
+      <div title="Multiplier of Vitality, Defense, and Intensity">Boosted HP/Original: ${getHealthMultTuple(this)}</div>
         <div title="Power needed, assuming 0 Attack Speed">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
         <div title="Defense needed, assuming 0 Intensity on Resistance Aura">Effective Defense: ${getFormattedMultiplierStr(getEffectiveDefense(this))}</div>
         <div>${StatOrder.map(stat => this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
