@@ -362,7 +362,7 @@ function getDamageMultTuple(build) {
 
   // Should be average damage per second (Damage from Blast spells per second + Poisoned damage per second + Gas damage per second)
   let defaultDamage = BASE_ATTACK * 0.5 + Math.floor(BASE_ATTACK * 0.05) + gasDamage
-  let actualDamage = (BASE_ATTACK + build.power) * (0.5 * secondaryMult(build.speed)) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) + Math.floor((BASE_ATTACK + build.power) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) * 0.05) + gasDamage
+  let actualDamage = (BASE_ATTACK + build.power()) * (0.5 * secondaryMult(build.speed())) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) + Math.floor((BASE_ATTACK + build.power()) * (use10Percent ? 1.1 : 1) * (1 - build.vit() / 500) * 0.05) + gasDamage
   return [actualDamage, defaultDamage]
 }
 
@@ -375,13 +375,13 @@ function getHealthMultTuple(build) {
   // Aura's default cooldown of ~40 seconds is reduced with Intensity, but the Aura is always 25 seconds
   // The following should be the average health of the player over the total cooldown of Aura
   let defaultHealth = (BASE_HEALTH * (25 * RESISTANCE_AURA + 15)) / 40
-  let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense) * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity)) + Math.max(40 / secondaryMult(build.intensity) - 25, 0)) / Math.max(40 / secondaryMult(build.intensity), 25)
+  let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit() + build.defense()) * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity())) + Math.max(40 / secondaryMult(build.intensity()) - 25, 0)) / Math.max(40 / secondaryMult(build.intensity()), 25)
   return [actualHealth, defaultHealth]
 }
 
 // Returns true multiplier, given Vitality, Power, Defense, Intensity, and Attack Speed
 function getMult(build) {
-  return (getDamageMultTuple(build)[0]/getDamageMultTuple(build)[1]) * (getHealthMultTuple(build)[0]/getHealthMultTuple(build)[1])
+  return (getDamageMultTuple(build)[0] / getDamageMultTuple(build)[1]) * (getHealthMultTuple(build)[0] / getHealthMultTuple(build)[1])
 }
 
 // Estimates the number of stats (translated to power) left after subtracting minimum stats
@@ -436,7 +436,7 @@ function getEffectivePower(build) {
 // Returns amount of Power needed for the default self to be equal
 function getEffectiveDefense(build) {
   // Basically doing the reverse of defaultHealth
-  return BASE_HEALTH * ((getHealthMultTuple(build)[0]/getHealthMultTuple(build)[1]) - 1)
+  return BASE_HEALTH * ((getHealthMultTuple(build)[0] / getHealthMultTuple(build)[1]) - 1)
 }
 
 // Solver.py
