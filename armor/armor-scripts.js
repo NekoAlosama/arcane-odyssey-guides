@@ -879,6 +879,7 @@ async function run() {
   wardingChange(document.getElementById("warding"));
   insanityChange(document.getElementById("insanity"));
   drawbackChange(document.getElementById("drawback"));
+  toggleIgnition()
   updateCopyPaste();
   defaultSettings = getSettings();
 
