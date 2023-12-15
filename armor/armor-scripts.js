@@ -296,8 +296,6 @@ class Build {
     return `
       <div class="list-element">
       <div title="Multiplier of all stats except Attack Size and Agility">Overall Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</div>
-      <div title="Multiplier of Vitality, Power, and Attack Speed">DPS/Original: ${getDamageMultTuple(this)}</div>
-      <div title="Multiplier of Vitality, Defense, and Intensity">Boosted HP/Original: ${getHealthMultTuple(this)}</div>
         <div title="Power needed, assuming 0 Attack Speed">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
         <div title="Defense needed, assuming 0 Intensity on Resistance Aura">Effective Defense: ${getFormattedMultiplierStr(getEffectiveDefense(this))}</div>
         <div>${StatOrder.map(stat => this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
@@ -347,7 +345,9 @@ function secondaryMult(stat) {
     return 1
   }
   else if (0.5 < stat < 272.5) {
-    return 2.24047567137 * 10 ** -5 * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582) + 9.88633994599 * 0.1
+    return (2.24047567137 * (10 ** -5))
+     * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582)
+     + 9.88633994599 * 0.1
   }
   else {
     return 0
