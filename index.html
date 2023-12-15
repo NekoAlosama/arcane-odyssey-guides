@@ -71,6 +71,18 @@
           <input id="use-10-percent" name="use-10-percent" type="checkbox" onchange="toggle10Percent(this)" checked>
           <span></span>
         </div>
+        <div>
+          <input id="fire-ignition" name="use-ignition" type="radio" onchange="toggleIgnition(this)" checkedFire>
+          <label for="fire-ignition">Ignite Gas with Fire</label>
+          <br>
+          <input id="plasma-ignition" name="use-ignition" type="radio" onchange="toggleIgnition(this)" checkedPlasma>
+          <label for="plasma-ignition">Ignite Gas with Plasma</label>
+          <br>
+          <input id="no-ignition" name="use-ignition" type="radio" onchange="toggleIgnition()">
+          <label for="no-ignition">Don't Ignite Gas</label>
+          <br>
+          <span></span>
+        </div>
         <br>
       </div>
       <div class="slider">

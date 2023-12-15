@@ -1103,3 +1103,8 @@ function toggleExoticJewelElement() {
   const ExoticJewelElement = document.getElementById("exotic-jewel-element");
   ExoticJewelElement.style.display = ExoticJewelElement.style.display == "none" ? "" : "none";
 }
+
+function toggleIgnition(input) {
+  useFire = input.checkedFire
+  usePlasma = input.checkedPlasma
+}
