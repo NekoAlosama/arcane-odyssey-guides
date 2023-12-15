@@ -75,10 +75,10 @@
           <input id="fire-ignition" name="use-ignition" type="radio" onchange="toggleIgnition()">
           <label for="fire-ignition">Ignite Gas with Fire</label>
           <br>
-          <input id="plasma-ignition" name="use-ignition" type="radio" onchange="toggleIgnition()">
+          <input id="plasma-ignition" name="use-ignition" type="radio" onchange="toggleIgnition()" checked>
           <label for="plasma-ignition">Ignite Gas with Plasma</label>
           <br>
-          <input id="no-ignition" name="use-ignition" type="radio" onchange="toggleIgnition()" checked>
+          <input id="no-ignition" name="use-ignition" type="radio" onchange="toggleIgnition()">
           <label for="no-ignition">Don't Ignite Gas</label>
           <br>
           <span></span>
@@ -97,7 +97,7 @@
       </div>
       <div class="slider">
         <label for="insanity">Max Insanity</label>
-        <input id="insanity" oninput="insanityChange(this)" name="insanity" type="range" min="0" max="5" step="1" value="1">
+        <input id="insanity" oninput="insanityChange(this)" name="insanity" type="range" min="0" max="5" step="1" value="0">
         <span><input class="input-text" id="insanity-text" oninput="insanityChange(this)" type="text" value="0"></span>
       </div>
       <div class="slider">
@@ -111,32 +111,32 @@
         <div>
           <div class="slider">
             <label for="min-power">Power</label>
-            <input id="min-power" oninput="minChange(0, this)" name="min-power" type="range" min="0" max="262" step="1" value="0">
+            <input id="min-power" oninput="minChange(0, this)" name="min-power" type="range" min="0" max="262" step="1" value="1">
             <span><input class="input-text" id="min-power-text" oninput="minChange(0, this)" type="text" value="0"></span>
           </div>
           <div class="slider">
             <label for="min-defense">Defense</label>
-            <input id="min-defense" oninput="minChange(1, this)" name="min-defense" type="range" min="0" max="2479" step="1" value="0">
+            <input id="min-defense" oninput="minChange(1, this)" name="min-defense" type="range" min="0" max="2479" step="1" value="1">
             <span><input class="input-text" id="min-defense-text" oninput="minChange(1, this)" type="text" value="0"></span>
           </div>
           <div class="slider secondary">
             <label for="min-size">Size</label>
-            <input id="min-size" oninput="minChange(2, this)" name="min-size" type="range" min="0" max="512" step="1" value="0">
+            <input id="min-size" oninput="minChange(2, this)" name="min-size" type="range" min="0" max="512" step="1" value="1">
             <span><input class="input-text" id="min-size-text" oninput="minChange(2, this)" type="text" value="0"></span>
           </div>
           <div class="slider secondary">
             <label for="min-intensity">Intensity</label>
-            <input id="min-intensity" oninput="minChange(3, this)" name="min-intensity" type="range" min="0" max="480" step="1" value="0">
+            <input id="min-intensity" oninput="minChange(3, this)" name="min-intensity" type="range" min="0" max="480" step="1" value="1">
             <span><input class="input-text" id="min-intensity-text" oninput="minChange(3, this)" type="text" value="0"></span>
           </div>
           <div class="slider secondary">
             <label for="min-speed">Speed</label>
-            <input id="min-speed" oninput="minChange(4, this)" name="min-speed" type="range" min="0" max="512" step="1" value="0">
+            <input id="min-speed" oninput="minChange(4, this)" name="min-speed" type="range" min="0" max="512" step="1" value="1">
             <span><input class="input-text" id="min-speed-text" oninput="minChange(4, this)" type="text" value="0"></span>
           </div>
           <div class="slider secondary">
             <label for="min-agility">Agility</label>
-            <input id="min-agility" oninput="minChange(5, this)" name="min-agility" type="range" min="0" max="412" step="1" value="0">
+            <input id="min-agility" oninput="minChange(5, this)" name="min-agility" type="range" min="0" max="412" step="1" value="1">
             <span><input class="input-text" id="min-agility-text" oninput="minChange(5, this)" type="text" value="0"></span>
           </div>
         </div>
