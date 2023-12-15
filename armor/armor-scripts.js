@@ -381,8 +381,8 @@ function getHealthMultTuple(build) {
   // Aura's default cooldown of ~40 seconds is reduced with Intensity, but the Aura is always 25 seconds
   // The following should be the average health of the player over the total cooldown of Aura
   let defaultHealth = (BASE_HEALTH * (25 * RESISTANCE_AURA + 15)) / 40
-  let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense())
-    * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity())) + Math.max(40 / secondaryMult(build.intensity()) - 25, 0)) / Math.max(40 / secondaryMult(build.intensity()), 25)
+  let actualHealth = ((BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense())
+    * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity())) + Math.max((40 / secondaryMult(build.intensity())) - 25, 0))) / Math.max(40 / secondaryMult(build.intensity()), 25)
   return [actualHealth, defaultHealth]
 }
 
