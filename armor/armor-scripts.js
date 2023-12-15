@@ -100,7 +100,7 @@ class CustomSet {
   }
 
   clear() {
-    this.entries = new Array(10000);
+    this.entries = new Array(100000);
     this.size = 0;
   }
 
@@ -463,8 +463,8 @@ const enchantMaxStats = [0, 0, 0, 0, 0, 0];
 const jewelMaxStats = [0, 0, 0, 0, 0, 0];
 const modifierMaxStats = [0, 0, 0, 0, 0, 0];
 
-const BUILD_SIZE = 1000;
-const ARMOR_SIZE = 5000;
+const BUILD_SIZE = 10000;
+const ARMOR_SIZE = 50000;
 
 let defaultSettings;
 
