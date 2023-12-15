@@ -124,13 +124,6 @@ const DAMAGE_AFFINITY = 0.75
 const BASE_ATTACK = 20 + (MAX_LEVEL - 1);
 const HEALTH_PER_VIT = 4;
 
-// TODO: Figure out how gas damage scales with level (WoM used to just have `floor(level / 10) + 10` so level 90 had 19 damage)
-// ^ Might just be `floor(level / 10) + 4`
-const GAS_DAMAGE = 16
-
-// 3% of max HP is removed per point of Drawback when using JUST BLAST
-const DRAWBACK_PERCENT = 0.03
-
 // Stat order: power defense size intensity speed agility
 
 // Tracking
@@ -357,6 +350,10 @@ function secondaryMult(stat) {
   }
 }
 
+
+// TODO: Figure out how gas damage scales with level (WoM used to just have `floor(level / 10) + 10` so level 90 had 19 damage)
+// ^ Might just be `floor(level / 10) + 4`
+const GAS_DAMAGE = 16
 function getDamageMultTuple(build) {
   // Affected by Vitality, Power, and Attack Speed (No Power Aura, yet)
 
@@ -380,12 +377,15 @@ const RESISTANCE_AURA = 2326 / 2009
 function getHealthMultTuple(build) {
   // Affected by Vitality, Defense, and Intensity (Resistance Aura only, for now)
 
+  // Total health reduction due to Drawback and how many times we can Blast per second
+  let drawbackReduction = (1 - 0.01 * build.drawback()) ** (0.5 * build.speed())
+
   // Aura's default cooldown of ~40 seconds is reduced with Intensity, but the Aura is always 25 seconds
   // The following should be the average health of the player over the total cooldown of Aura
   let defaultHealth = (BASE_HEALTH * 1.005 * (25 * RESISTANCE_AURA + 15)) / 40
-  let actualHealth = ((BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense())
-    * (25 * (1.005 * RESISTANCE_AURA * secondaryMult(build.intensity()) - 0.5 * secondaryMult(build.speed()) * DRAWBACK_PERCENT * build.drawback())
-      + Math.max((40 / secondaryMult(build.intensity())) - 25, 0) * (1.005 - 0.5 * secondaryMult(build.speed()) * DRAWBACK_PERCENT * build.drawback())))
+  let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense()) * 1.005
+    * (25 * RESISTANCE_AURA * secondaryMult(build.intensity()) * (drawbackReduction ** 25)
+      + Math.max(40 / secondaryMult(build.intensity()) - 25, 0) * (drawbackReduction ** Math.max(40 / secondaryMult(build.intensity()) - 25, 0)))
     / Math.max(40 / secondaryMult(build.intensity()), 25)
   return [actualHealth, defaultHealth]
 }
