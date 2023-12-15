@@ -1104,13 +1104,7 @@ function toggleExoticJewelElement() {
   ExoticJewelElement.style.display = ExoticJewelElement.style.display == "none" ? "" : "none";
 }
 
-function toggleIgnition(input) {
-  useFire = false
-  usePlasma = false
-
-  if (input == "fire") {
-    useFire = true
-  } else if (input == "plasma") {
-    usePlasma = true
-  }
+function toggleIgnition() {
+  useFire = document.getElementById("fire-ignition").checked
+  usePlasma = document.getElementById("plasma-ignition").checked
 }
