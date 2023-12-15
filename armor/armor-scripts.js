@@ -7,8 +7,8 @@ let warding = 4;
 let insanity = 3;
 let drawback = 0;
 let includeSecondary = true;
-let useSunken = true;
-let sunkenWarrior = true;
+let useSunken = false;
+let sunkenWarrior = false;
 let useJewels = true;
 let useModifier = true;
 let exoticEnchant = true;
@@ -295,7 +295,8 @@ class Build {
   asHTML() {
     return `
       <div class="list-element">
-      <div title="Multiplier of all stats except Attack Size and Agility">Overall Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</div>
+      <div title="Multiplier of all stats except Attack Size and Agility">Min Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</div>
+      <div title="Multiplier of all stats except Attack Size and Agility">Max Multiplier: ${getFormattedMultiplierStr(this.multiplier * secondaryMult(this.agility()) * secondaryMult(this.size()))}</div>
         <div title="Power needed, assuming 0 Attack Speed">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
         <div title="Defense needed, assuming 0 Intensity on Resistance Aura">Effective Defense: ${getFormattedMultiplierStr(getEffectiveDefense(this))}</div>
         <div>${StatOrder.map(stat => this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
@@ -1034,7 +1035,7 @@ function pasteSettings(input) {
   });
 
   // Set settings
-  document.getElementById("use-sunken").checked = settings.s === 1;
+  document.getElementById("use-sunken").checked = settings.s === 0;
   document.getElementById("use-secondary").checked = settings.se === 1;
   document.getElementById("use-10-percent").checked = settings.per === 1;
   document.getElementById("use-jewels").checked = settings.j === 1;
