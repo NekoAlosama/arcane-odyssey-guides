@@ -1,44 +1,23 @@
 // For Armor.html
 
 // Config
-let MODE_BONUS = .2;
-let decimalPlaces = 3;
-// Unlike python script, these range from [0, 1]
-const weights = [1, 1, .25, .5, .5, .4, 0, 0, 0];
 const minStats = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 let vit = 0;
-let insanity = 3;
 let warding = 4;
+let insanity = 3;
 let drawback = 0;
 let includeSecondary = true;
 let useSunken = true;
 let sunkenWarrior = true;
-let useAmulet = true;
 let useJewels = true;
 let useModifier = true;
 let exoticEnchant = true;
 let exoticJewel = true;
-let nonZero = true;
 let logEnabled = true;
 
-function getPowerWeight() {
-  return weights[0];
-}
-function getDefenseWeight() {
-  return weights[1];
-}
-function getSizeWeight() {
-  return weights[2];
-}
-function getIntensityWeight() {
-  return weights[3];
-}
-function getSpeedWeight() {
-  return weights[4];
-}
-function getAgilityWeight() {
-  return weights[5];
-}
+let usePlasma = false
+let useFire = false
+let use10Percent = true
 
 // Custom set (hashmap implementation)
 
@@ -141,8 +120,13 @@ class CustomSet {
 // Data.py
 const MAX_LEVEL = 125;
 const BASE_HEALTH = 100 + 7 * (MAX_LEVEL - 1);
-const BASE_ATTACK = 20 + (MAX_LEVEL - 1);
+const DAMAGE_AFFINITY = 0.75
+const BASE_ATTACK = DAMAGE_AFFINITY * (20 + (MAX_LEVEL - 1));
 const HEALTH_PER_VIT = 4;
+
+// TODO: Figure out how gas damage scales with level (WoM used to just have `floor(level / 10) + 10` so level 90 had 19 damage)
+// ^ Might just be `floor(level / 10) + 4`
+const GAS_DAMAGE = 16
 
 // Stat order: power defense size intensity speed agility
 
@@ -158,7 +142,7 @@ class Armor {
     this.nonZeroStats = stats.map((val, i) => i).filter(i => stats[i] > 0);
   }
 }
-Armor.prototype.toString = function() {
+Armor.prototype.toString = function () {
   return this.name;
 }
 
@@ -210,9 +194,9 @@ class Build {
     this.jewelSlots = armorList.reduce((sum, armor) => sum + armor.jewelSlots, 0);
     this.hash = getHash(this.stats);
     // this.statCode = getStatCode(stats);
-    this.multiplier = getMult(this) + getExtraTotalStats(this) / (BASE_ATTACK / 2 + BASE_HEALTH / Ratio[1] / 2);
+    this.multiplier = getMult(this) // + getExtraTotalStats(this) / (BASE_ATTACK / 2 + BASE_HEALTH / Ratio[1] / 2);
   }
-  
+
   value() {
     return this.multiplier;
   }
@@ -250,11 +234,11 @@ class Build {
   agility() {
     return this.stats[5];
   }
-  insanity() {
-    return this.stats[6];
-  }
   warding() {
     return this.stats[7];
+  }
+  insanity() {
+    return this.stats[6];
   }
   drawback() {
     return this.stats[8];
@@ -307,32 +291,28 @@ class Build {
   }
 
   // HTML incorporation
-  // value is from (1.7, 2.7)
-  multiplierColorStr() {
-    return getMultiplierColorStr(this.multiplier);
-  }
 
   asHTML() {
     return `
       <div class="list-element">
-        <div title="Multiplier of all stats, scales with weight">Multiplier: <span style="color: ${this.multiplierColorStr()}">${getFormattedMultiplierStr(this.multiplier)}</span></div>
-        ${`<div title="Multiplier from power and defense">Base Multiplier: <span style="color: ${getMultiplierColorStr(getBaseMult(this))}">${getFormattedMultiplierStr(getBaseMult(this))}</span></div>`}
-        <div title="Total stats, normalized to power">Power Equivalence: <span style="color: ${getMultiplierColorStr(getPowerEquivalence(this) / 80)}">${getFormattedMultiplierStr(getPowerEquivalence(this), 2)}</span></div>
-        <div>${StatOrder.map(stat => nonZero && this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
+        <div title="Multiplier of all stats except Attack Size and Agility">Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</span></div>
+        <div title="Power needed, assuming 0 Attack Speed">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</span></div>
+        <div title="Defense needed, assuming 0 Intensity on Resistance Aura">Effective Defense: ${getFormattedMultiplierStr(getEffectivePower(this))}</span></div>
+        <div>${StatOrder.map(stat => this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
         <div class="br-small"></div>
         <table>
           <th>Armor</th>
           ${this.armorList.map(armor => {
-            const armorName = armor.toString().replaceAll("_", " ");
-            return `<tr><td class="${armorName.split(" ")[0].toLowerCase()}">${armor.modifier != undefined ? armor.modifier + " " : ""}${armor.enchant} ${armorName}</td></tr>
+      const armorName = armor.toString().replaceAll("_", " ");
+      return `<tr><td class="${armorName.split(" ")[0].toLowerCase()}">${armor.modifier != undefined ? armor.modifier + " " : ""}${armor.enchant} ${armorName}</td></tr>
             <tr><td>${armor.jewels.join(" ")}</td></tr>`;
-          }).join("")}
+    }).join("")}
         </table>
       </div>
     `;
   }
 }
-Build.prototype.toString = function() {
+Build.prototype.toString = function () {
   let output = `Multiplier: ${(Math.round(this.multiplier * 10000) / 10000)}\nBonus Stats: ${this.stats.join("/")}\nArmor: ${this.armorList.join(" ")}`;
   output += `\nEnchants: ${this.enchants.join('/')}`;
   return output;
@@ -353,39 +333,55 @@ function getStatCode(stats) {
   return stats.reduce((acc, val, i) => acc * absMaxStats[i] + BigInt(val), 0n);
 }
 
-function getMultiplierColorStr(mult) {
-  return `hsl(${(mult - 2) * 75}, 100%, 40%)`;
+function getFormattedMultiplierStr(mult) {
+  const tens = 10 ** 4;
+  return `${Math.floor(mult)}.${(Math.floor(mult * tens) % tens).toString().padStart(4, "0")}`;
 }
 
-function getFormattedMultiplierStr(mult, decimals = decimalPlaces) {
-  const tens = 10 ** decimals;
-  return `${Math.floor(mult)}.${(Math.floor(mult * tens) % tens).toString().padStart(decimals, "0")}`;
+// Effect interpolation for Attack Speed and Intensity
+// TODO: Measure Power Aura multiplier, since idk if it would be better for me or not
+function secondaryMult(stat) {
+  if (-0.5 < stat < 0.5) {
+    return 1
+  }
+  else if (0.5 < stat < 272.5) {
+    return 2.24047567137 * 10 ** -5 * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582) + 9.88633994599 * 0.1
+  }
+  else {
+    return NaN
+  }
 }
 
-// pow/def, vit multiplier without weight
-function getBaseMult(build, useWeight = false) {
-  return ((build.vit * HEALTH_PER_VIT + build.stats[1]) / BASE_HEALTH * (useWeight ? getDefenseWeight() : 1) + 1) * ((-build.vit / (MAX_LEVEL * 2) * .5 + build.stats[0] / BASE_ATTACK) * (useWeight ? getPowerWeight() : 1) + 1);
+function getDamageMultTuple(build) {
+  // Affected by Vitality, Power, and Attack Speed (No Power Aura, yet)
+
+  // Ideally, the Poisoned effect and gas should be damaging the enemy at all times
+  // Gas ignited from Fire magic makes an explosion that causes damage (untested), but halves the tick rate of damage (1 second per tick to 2 seconds per tick) and halves the duration of clouds
+  // Gas ignited from Plasma magic doubles the tick rate of damage (1 second per tick to 0.5 seconds per tick) and halves the duration of clouds
+  let gasDamage = GAS_DAMAGE * (1 + 1 * usePlasma - 0.5 * useFire)
+
+  // Should be average damage per second (Damage from Blast spells per second + Poisoned damage per second + Gas damage per second)
+  let defaultDamage = BASE_ATTACK * 0.5 + Math.floor(BASE_ATTACK * 0.05) + gasDamage
+  let actualDamage = (BASE_ATTACK + build.power) * (0.5 * secondaryMult(build.speed)) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) + Math.floor((BASE_ATTACK + build.power) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) * 0.05) + gasDamage
+  return (actualDamage, defaultDamage)
 }
 
-// Returns modified multiplier affected by weight
+// Resistance Aura multiplies secondaryMult(build.intensity) by about 2326/2009 (using Resistance Aura with 2009 HP and 0 Intensity)
+// ^ Might be 22/19
+const RESISTANCE_AURA = 2326 / 2009
+function getHealthMultTuple(build) {
+  // Affected by Vitality, Defense, and Intensity (Resistance Aura only, for now)
+
+  // Aura's default cooldown of ~40 seconds is reduced with Intensity, but the Aura is always 25 seconds
+  // The following should be the average health of the player over the total cooldown of Aura
+  let defaultHealth = (BASE_HEALTH * (25 * RESISTANCE_AURA + 15)) / 40
+  let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense) * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity)) + Math.max(40 / secondaryMult(build.intensity) - 25, 0)) / Math.max(40 / secondaryMult(build.intensity), 25)
+  return (actualHealth, defaultHealth)
+}
+
+// Returns true multiplier, given Vitality, Power, Defense, Intensity, and Attack Speed
 function getMult(build) {
-  // const mult = (BASE_HEALTH * (1 + build.vit / (MAX_LEVEL * 2) * 1.1) + build.stats[1]) * getDefenseWeight() / BASE_HEALTH * (BASE_ATTACK + build.stats[0] * (1 - build.vit / (MAX_LEVEL * 2) * .5)) * getPowerWeight() / BASE_ATTACK;
-  const mult = getBaseMult(build, true);
-  if (includeSecondary)
-    return mult * otherMult(build);
-  return mult;
-}
-
-// secondary stats multiplier
-function otherMult(build) {
-  const modeMultiplier = 1 / (1 / MODE_BONUS + 1);
-  return ((estimateMultComplex(build.stats[2]) - 1) * getSizeWeight() * 4/7 + 1) * ((1 + estimateMultComplex(build.stats[3]) * getIntensityWeight() * modeMultiplier) / (1 + getIntensityWeight() * modeMultiplier)) * ((estimateMultComplex(build.stats[4]) - 1) * getSpeedWeight() * 4/7 + 1) * ((estimateMultComplex(build.stats[5]) - 1) * getAgilityWeight() * 4/7 + 1);
-}
-
-// estimate effect of secondary stats (bc non-linear)
-function estimateMultComplex(stat) {
-  // return Math.pow(.01194 * Math.pow(stat, 1.188) + 1, .3415) + .06195 * Math.pow(stat, .2992) - .0893 * Math.log(stat + 1) / Math.log(30);
-  return 2.02197 * Math.pow(stat + 22.5647, -.22586) + .0316989 * Math.pow(stat, .733205);
+  return (getDamageMultTuple(build)[0]/getDamageMultTuple(build)[1]) * (getHealthMultTuple(build)[0]/getHealthMultTuple(build)[1])
 }
 
 // Estimates the number of stats (translated to power) left after subtracting minimum stats
@@ -397,13 +393,13 @@ function getExtraStats(build) {
 
   const painites = Math.min(drawback - build.drawback(), jewelsLeft);
   const virtuous = warding - build.warding();
-  
+
   statsLeft += virtuous * 54 / Ratio[1] + (enchantsLeft - virtuous) * enchantMax;
   if (useJewels)
     statsLeft += painites * 125 / Ratio[1] + (jewelsLeft - painites) * jewelMax;
   if (useModifier)
     statsLeft += modifiersLeft * modifierMax;
-  
+
   for (const i in build.stats) {
     if (!includeSecondary && i >= 2)
       continue;
@@ -431,14 +427,21 @@ function getExtraTotalStats(build) {
   return val;
 }
 
-// Returns the total number of stats, normalized to power, in the build 
-function getPowerEquivalence(build) {
-  return build.stats.reduce((acc, val, i) => acc + val / Ratio[i], 0) * Ratio[0];
+// Returns amount of Power needed for the default self to be equal
+function getEffectivePower(build) {
+  // Basically doing the reverse of defaultDamage
+  return (getDamageMultTuple(build)[0] - GAS_DAMAGE * (1 + 1 * usePlasma - 0.5 * useFire) - 59) / 0.4125
+}
+
+// Returns amount of Power needed for the default self to be equal
+function getEffectiveDefense(build) {
+  // Basically doing the reverse of defaultHealth
+  return BASE_HEALTH * ((getHealthMultTuple(build)[0]/getHealthMultTuple(build)[1]) - 1)
 }
 
 // Solver.py
 const Order = ["Amulet", "Accessory", "Boots", "Chestplate", "Enchant", "Helmet", "Jewel", "Modifier"];
-const StatOrder = ["power", "defense", "size", "intensity", "speed", "agility", "insanity", "warding", "drawback"];
+const StatOrder = ["power", "defense", "size", "intensity", "speed", "agility", "warding", "insanity", "drawback"];
 const MainStats = StatOrder.slice(0, 6);
 const Ratio = [1, 9, 3, 3, 3, 3, 1, 1, 1];
 let Armors;
@@ -602,7 +605,7 @@ function solve() {
           const accessory2 = accessories2[j];
           // Make accessory3 array (amulets)
           // If accessory2 is a helmet (j < length), allow only other accessories, otherwise allow accessories after j
-          const accessories3 = (j < length ? accessories2.slice(length) : accessories2.slice(j + 1)).concat(useAmulet ? Armors[0] : []);
+          const accessories3 = (j < length ? accessories2.slice(length) : accessories2.slice(j + 1)).concat(Armors[0]);
 
           for (const accessory3 of accessories3) {
             const armorList = [armor, boot, accessory1, accessory2, accessory3].map(armor => new MainArmor(armor.name, armor.stats, armor.jewelSlots, armor.canMod));
@@ -669,7 +672,7 @@ function solve() {
             else {
               dupesModifier++;
             }
-            
+
             if (modifierSet.size > ARMOR_SIZE * 10) {
               const modifierArr = purge(modifierSet.toList());
               modifierSet.clear();
@@ -744,7 +747,7 @@ function solve() {
           else {
             dupesEnchant++;
           }
-          
+
           if (enchantSet.size > ARMOR_SIZE * 10) {
             const enchantArr = purge(enchantSet.toList());
             enchantSet.clear();
@@ -810,7 +813,7 @@ function solve() {
           const armorList = duplicateArmorList(enchantBuild.armorList);
 
           // figure out which armor to add jewel to
-          let index = 0, used = enchantBuild.jewelSlots - 10 + i; 
+          let index = 0, used = enchantBuild.jewelSlots - 10 + i;
           for (const armor of armorList) {
             if (used < armor.jewelSlots) {
               break;
@@ -866,13 +869,10 @@ async function run() {
   for (const i in MainStats) {
     const statName = MainStats[i];
     minChange(i, document.getElementById(`min-${statName}`));
-    if (i >= 2)
-      weightChange(i, document.getElementById(`weight-${statName}`));
   }
-  insanityChange(document.getElementById("insanity"));
   wardingChange(document.getElementById("warding"));
+  insanityChange(document.getElementById("insanity"));
   drawbackChange(document.getElementById("drawback"));
-  modeBonusChange(document.getElementById("mode-bonus"));
   updateCopyPaste();
   defaultSettings = getSettings();
 
@@ -887,7 +887,6 @@ async function run() {
 async function update() {
   useSunken = document.getElementById("use-sunken").checked;
   sunkenWarrior = document.getElementById("sunken-warrior").checked;
-  useAmulet = document.getElementById("use-amulet").checked;
   useJewels = document.getElementById("use-jewels").checked;
   useModifier = document.getElementById("use-modifier").checked;
   exoticEnchant = document.getElementById("exotic-enchant").checked;
@@ -909,7 +908,6 @@ async function update() {
     else {
       armorList.innerHTML = "";
       for (const build of builds) {
-        // TODO update right here
         const div = document.createElement("div");
         // div.className = "list-element";
         div.innerHTML = build.asHTML();
@@ -950,13 +948,13 @@ function vitChange(input) {
   }
 }
 
-function decimalsChange(input) {
+function wardingChange(input) {
   const int = parseInt(input.value);
   if (!isNaN(int)) {
-    const value = Math.max(parseInt(document.getElementById("decimals").min), Math.min(int, parseInt(document.getElementById("decimals").max)));
-    document.getElementById("decimals-text").value = value;
-    document.getElementById("decimals").value = value;
-    decimalPlaces = value;
+    const value = Math.max(parseInt(document.getElementById("warding").min), Math.min(int, parseInt(document.getElementById("warding").max)));
+    document.getElementById("warding-text").value = value;
+    document.getElementById("warding").value = value;
+    warding = value;
     updateCopyPaste();
   }
 }
@@ -972,17 +970,6 @@ function insanityChange(input) {
   }
 }
 
-function wardingChange(input) {
-  const int = parseInt(input.value);
-  if (!isNaN(int)) {
-    const value = Math.max(parseInt(document.getElementById("warding").min), Math.min(int, parseInt(document.getElementById("warding").max)));
-    document.getElementById("warding-text").value = value;
-    document.getElementById("warding").value = value;
-    warding = value;
-    updateCopyPaste();
-  }
-}
-
 function drawbackChange(input) {
   const int = parseInt(input.value);
   if (!isNaN(int)) {
@@ -990,29 +977,6 @@ function drawbackChange(input) {
     document.getElementById("drawback-text").value = value;
     document.getElementById("drawback").value = value;
     drawback = value;
-    updateCopyPaste();
-  }
-}
-
-function weightChange(index, input) {
-  const int = parseInt(input.value);
-  if (!isNaN(int)) {
-    const statName = MainStats[index];
-    const value = Math.max(parseInt(document.getElementById(`weight-${statName}`).min), Math.min(int, parseInt(document.getElementById(`weight-${statName}`).max)));
-    document.getElementById(`weight-${statName}-text`).value = value;
-    document.getElementById(`weight-${statName}`).value = value;
-    weights[index] = value / 100;
-    updateCopyPaste();
-  }
-}
-
-function modeBonusChange(input) {
-  const int = parseInt(input.value);
-  if (!isNaN(int)) {
-    const value = Math.max(parseInt(document.getElementById("mode-bonus").min), Math.min(int, parseInt(document.getElementById("mode-bonus").max)));
-    document.getElementById("mode-bonus-text").value = value;
-    document.getElementById("mode-bonus").value = value;
-    MODE_BONUS = value / 100;
     updateCopyPaste();
   }
 }
@@ -1033,18 +997,13 @@ function toggleExoticJewel(input) {
 
 function getSettings() {
   return {
-    nz: nonZero ? 1 : 0,
     s: document.getElementById("use-sunken").checked ? 1 : 0,
-    a: document.getElementById("use-amulet").checked ? 1 : 0,
     se: document.getElementById("use-secondary").checked ? 1 : 0,
     v: parseInt(document.getElementById("vit").value),
-    d: decimalPlaces,
-    i: insanity,
     wa: warding,
+    i: insanity,
     dr: drawback,
     min: minStats,
-    w: weights,
-    mb: MODE_BONUS,
   };
 }
 
@@ -1068,32 +1027,25 @@ function pasteSettings(input) {
   });
 
   // Set settings
-  document.getElementById("only-nonzero").checked = settings.nz === 1;
   document.getElementById("use-sunken").checked = settings.s === 1;
-  document.getElementById("use-amulet").checked = settings.a === 1;
   document.getElementById("use-secondary").checked = settings.se === 1;
+  document.getElementById("use-10-percent").checked = settings.per === 1;
   document.getElementById("use-jewels").checked = settings.j === 1;
   document.getElementById("use-exotic").checked = settings.e === 1;
   document.getElementById("vit").value = settings.v;
-  document.getElementById("decimals").value = settings.d;
-  document.getElementById("mode-bonus").value = MODE_BONUS * 100;
-  toggleNonZero(document.getElementById("only-nonzero"));
   toggleSecondary(document.getElementById("use-secondary"));
+  toggle10Percent(document.getElementById("use-10-percent"));
   toggleExotic(document.getElementById("use-exotic"));
   vitChange(document.getElementById("vit"));
-  decimalsChange(document.getElementById("decimals"));
-  modeBonusChange(document.getElementById("mode-bonus"));
   for (const i in MainStats) {
     const statName = MainStats[i];
     document.getElementById(`min-${statName}`).value = settings.min[i];
-    document.getElementById(`weight-${statName}`).value = settings.w[i] * 100;
     minChange(i, document.getElementById(`min-${statName}`));
-    weightChange(i, document.getElementById(`weight-${statName}`));
   }
-  document.getElementById("insanity").value = settings.i;
-  insanityChange(document.getElementById("insanity"));
   document.getElementById("warding").value = settings.wa;
   wardingChange(document.getElementById("warding"));
+  document.getElementById("insanity").value = settings.i;
+  insanityChange(document.getElementById("insanity"));
   document.getElementById("drawback").value = settings.dr;
   drawbackChange(document.getElementById("drawback"));
 }
@@ -1109,10 +1061,7 @@ function copySettings(input) {
 
 // Settings toggles
 
-function toggleNonZero(input) {
-  nonZero = input.checked;
-  updateCopyPaste();
-}
+// removed toggle function for nonzero, assume true or 1
 
 // no toggle function for sunken
 // no toggle function for amulet
@@ -1133,31 +1082,18 @@ function toggleSecondary(input) {
   updateCopyPaste();
 }
 
+function toggle10Percent(input) {
+  use10Percent = input.checked;
+  updateCopyPaste();
+}
+
 // UI related toggles
 
 function toggleLog(input) {
   logEnabled = input.checked;
 }
 
-function toggleInfo(element) {
-  const infoElement = document.getElementById("info");
-  infoElement.style.display = infoElement.style.display == "none" ? "" : "none";
-  element.innerText = infoElement.style.display == "" ? "Hide Info" : "Show Info";
-  window.sessionStorage.setItem("showInfo", infoElement.style.display);
-}
-
-function toggleIgnoreList(element) {
-  const ignoreListElement = document.getElementById("filter-list");
-  ignoreListElement.style.display = ignoreListElement.style.display == "none" ? "" : "none";
-  element.innerText = ignoreListElement.style.display == "" ? "Hide Filters" : "Show Filters";
-  window.sessionStorage.setItem("showIgnoreList", ignoreListElement.style.display);
-}
-
-// Runs when website loads
-function onBodyLoad() {
-  // update();
-  if (window.sessionStorage.getItem("showInfo"))
-    toggleInfo(document.getElementById("visibility-button"));
-  if (window.sessionStorage.getItem("showIgnoreList"))
-    toggleIgnoreList(document.getElementById("filter-list-button"));
+function toggleExoticJewelElement() {
+  const ExoticJewelElement = document.getElementById("exotic-jewel-element");
+  ExoticJewelElement.style.display = ExoticJewelElement.style.display == "none" ? "" : "none";
 }

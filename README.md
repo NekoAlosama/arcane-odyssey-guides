@@ -1,13 +1,4 @@
-# Arcane Odyssey Guides
-This website contains helpers (e.g. to find the best possible armor) and more stuff in the future.
+# Personal Armor Builder for NekoAlosama (Dec. 14, 2023)
+Only useful for Poison Mage. Uses mostly personally-derived equations.
 
-# Main Page
-https://myaltaccountsthis.github.io/arcane-odyssey-guides/
-
-## Subpages
-[Armor Builds](https://myaltaccountsthis.github.io/arcane-odyssey-guides/armor)\
-[Treasure Chart Locator](https://myaltaccountsthis.github.io/arcane-odyssey-guides/treasure)
-
-## Known Issues
-Armor Calculator for secondary stat-based builds may not be fully accurate due to optimizations needed to improve run time.
-Min Stats might overcompensate that stat due to naive algorithm (gonna need to fix), Max Stats is generally inaccurate and might be removed.
+Original armor build helper by myaltaccountsthis/a-fakeusername.

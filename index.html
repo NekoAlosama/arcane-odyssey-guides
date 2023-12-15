@@ -1,26 +1,144 @@
 <!DOCTYPE html>
 <html>
   <head>
-		<title>Arcane Odyssey Guides</title>
+		<title>Arcane Odyssey Armor Builds</title>
 		<link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="styles.css">
+    <script src="armor/armor-scripts.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YC04R7C65B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YC04R7C65B');
+    </script>
   </head>
-  <body>
-    <h1>Arcane Odyssey Guides</h1>
-    <p>This is the homepage</p>
-    <div>Check the source code <a target="_blank" href="https://github.com/myaltaccountsthis/arcane-odyssey-guides">here</a></div>
+  <body onload="run()">
+    <h1>Arcane Odyssey Armor Build</h1>
     <br>
-    <div><b>Made by myaltaccountsthis</b></div>
-    <div class="br-small"></div>
-    <div class="vlist">
-      <div><a href="armor">Armor Builds</a></div>
-      <div><a href="treasure">Treasure Chart Locator</a></div>
+    <div id="info">
+      <div><a target="_blank" href="https://github.com/NekoAlosama/arcane-odyssey-guides">Modification by NekoAlosamas</a></div>
+      <div>Only useful for Poison Mage. Uses mostly personally-derived equations.</div>
+      <div><a target="_blank" href="https://github.com/myaltaccountsthis/arcane-odyssey-guides">Original repo by myaltaccountsthis</a></div>
+      <br>
+      <div><b>Armor</b>: list of required armor pieces</div>
+      <div><b>Multiplier</b>: estimated multiplicative increase against a default version of yourself (Max level, no Vitality, no gear, same magics)</div>
+      <div>Jewels and enchants can be swapped around unless items has Atlantean modifier</div>
+      <div>Builder runs faster with tighter bounds</div>
     </div>
-    <br><br>
-    <div><b>Made by others</b></div>
-    <div class="br-small"></div>
-    <div class="vlist">
-      <div><i>Storntreat</i> - <a target="_blank" href="https://docs.google.com/presentation/d/1F8-wjkYacgPZFN31cq05TqTsPN3v3X_gzQxA4RDsjGA/edit?usp=sharing">Wanted Criminal Locations</a></div>
-    </div>
+    <form onsubmit="return false">
+      <div class="br-small"></div>
+      <div id="filter-list">
+        <div>
+          <label for="use-sunken">Use Sunken</label>
+          <input id="use-sunken" name="use-sunken" type="checkbox" checked>
+          <span></span>
+        </div>
+        <div>
+          <label for="sunken-warrior">Use Sunken Warrior</label>
+          <input id="sunken-warrior" name="sunken-warrior" type="checkbox" checked>
+          <span></span>
+        </div>
+        <div>
+          <label for="use-jewels">Use Jewels</label>
+          <input id="use-jewels" name="use-jewels" type="checkbox" onchange="toggleExoticJewelElement()" checked>
+          <span></span>
+        </div>
+        <div id="exotic-jewel-element">
+          <label for="exotic-jewel">Use Exotic Jewels</label>
+          <input id="exotic-jewel" name="exotic-jewel" type="checkbox" onchange="toggleExoticJewel(this)" checked>
+          <span></span>
+        </div>
+        <div>
+          <label for="use-modifier">Use Modifiers</label>
+          <input id="use-modifier" name="use-modifier" type="checkbox" checked>
+          <span></span>
+        </div>
+        <div>
+          <label for="exotic-enchant">Use Exotic Enchants</label>
+          <input id="exotic-enchant" name="exotic-enchant" type="checkbox" onchange="toggleExoticEnchant(this)" checked>
+          <span></span>
+        </div>
+        <div>
+          <label for="use-secondary">Use Secondary Stats</label>
+          <input id="use-secondary" name="use-secondary" type="checkbox" onchange="toggleSecondary(this)" checked>
+          <span></span>
+        </div>
+        <div>
+          <label for="use-10-percent">Use Shapes with 10% Damage Increase</label>
+          <input id="use-10-percent" name="use-10-percent" type="checkbox" onchange="toggle10Percent(this)" checked>
+          <span></span>
+        </div>
+        <br>
+      </div>
+      <div class="slider">
+        <label for="vit">Vitality</label>
+        <input id="vit" oninput="vitChange(this)" name="vit" type="range" min="0" max="150" step="1" value="0">
+        <span><input class="input-text" id="vit-text" oninput="vitChange(this)" type="text" value="0"></span>
+      </div>
+      <div class="slider">
+        <label for="warding">Warding</label>
+        <input id="warding" oninput="wardingChange(this)" name="warding" type="range" min="0" max="5" step="1" value="0">
+        <span><input class="input-text" id="warding-text" oninput="wardingChange(this)" type="text" value="0"></span>
+      </div>
+      <div class="slider">
+        <label for="insanity">Max Insanity</label>
+        <input id="insanity" oninput="insanityChange(this)" name="insanity" type="range" min="0" max="5" step="1" value="0">
+        <span><input class="input-text" id="insanity-text" oninput="insanityChange(this)" type="text" value="0"></span>
+      </div>
+      <div class="slider">
+        <label for="drawback">Max Drawback</label>
+        <input id="drawback" oninput="drawbackChange(this)" name="drawback" type="range" min="0" max="20" step="1" value="0">
+        <span><input class="input-text" id="drawback-text" oninput="drawbackChange(this)" type="text" value="0"></span>
+      </div>
+      
+      <br>
+      <div class="big">Mins</div>
+        <div>
+          <div class="slider">
+            <label for="min-power">Power</label>
+            <input id="min-power" oninput="minChange(0, this)" name="min-power" type="range" min="0" max="262" step="1" value="0">
+            <span><input class="input-text" id="min-power-text" oninput="minChange(0, this)" type="text" value="0"></span>
+          </div>
+          <div class="slider">
+            <label for="min-defense">Defense</label>
+            <input id="min-defense" oninput="minChange(1, this)" name="min-defense" type="range" min="0" max="2479" step="1" value="0">
+            <span><input class="input-text" id="min-defense-text" oninput="minChange(1, this)" type="text" value="0"></span>
+          </div>
+          <div class="slider secondary">
+            <label for="min-size">Size</label>
+            <input id="min-size" oninput="minChange(2, this)" name="min-size" type="range" min="0" max="512" step="1" value="0">
+            <span><input class="input-text" id="min-size-text" oninput="minChange(2, this)" type="text" value="0"></span>
+          </div>
+          <div class="slider secondary">
+            <label for="min-intensity">Intensity</label>
+            <input id="min-intensity" oninput="minChange(3, this)" name="min-intensity" type="range" min="0" max="480" step="1" value="0">
+            <span><input class="input-text" id="min-intensity-text" oninput="minChange(3, this)" type="text" value="0"></span>
+          </div>
+          <div class="slider secondary">
+            <label for="min-speed">Speed</label>
+            <input id="min-speed" oninput="minChange(4, this)" name="min-speed" type="range" min="0" max="512" step="1" value="0">
+            <span><input class="input-text" id="min-speed-text" oninput="minChange(4, this)" type="text" value="0"></span>
+          </div>
+          <div class="slider secondary">
+            <label for="min-agility">Agility</label>
+            <input id="min-agility" oninput="minChange(5, this)" name="min-agility" type="range" min="0" max="412" step="1" value="0">
+            <span><input class="input-text" id="min-agility-text" oninput="minChange(5, this)" type="text" value="0"></span>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div>
+        <div>Copy Paste Settings</div>
+        <input class="input-text" style="width: 40%; min-width: 300px; max-width: 800px; font-family: Consolas, 'Courier New';" id="copy-paste" type="text" value="" onblur="pasteSettings(this)">
+        <input type="button" onclick="copySettings(this)" value="Copy">
+      </div>
+      <br>
+      <input type="button" onclick="update()" value="Update">
+    </form>
+    <br>
+    <div id="armor-list"></div>
   </body>
 </html>
