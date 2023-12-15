@@ -295,10 +295,10 @@ class Build {
   asHTML() {
     return `
       <div class="list-element">
-      <div title="Multiplier of all stats except Attack Size and Agility">Min Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</div>
-      <div title="Multiplier of all stats except Attack Size and Agility">Max Multiplier: ${getFormattedMultiplierStr(this.multiplier * secondaryMult(this.agility()) * secondaryMult(this.size()))}</div>
-        <div title="Power needed, assuming 0 Attack Speed">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
-        <div title="Defense needed, assuming 0 Intensity on Resistance Aura">Effective Defense: ${getFormattedMultiplierStr(getEffectiveDefense(this))}</div>
+      <div title="Multiplier of all stats except Attack Size and Agility">Lower Bound: ${getFormattedMultiplierStr(this.multiplier)}</div>
+      <div title="Multiplier of all stats including Attack Size and Agility">Upper Bound: ${getFormattedMultiplierStr(this.multiplier * secondaryMult(this.agility()) * secondaryMult(this.size()))}</div>
+        <div title="Equivalent amount of Power given no other stats">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
+        <div title="Equivalent amount of Defense given no other stats">Effective Defense: ${getFormattedMultiplierStr(getEffectiveDefense(this))}</div>
         <div>${StatOrder.map(stat => this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
         <div class="br-small"></div>
         <table>
@@ -347,8 +347,8 @@ function secondaryMult(stat) {
   }
   else if (0.5 < stat < 272.5) {
     return (2.24047567137 * (10 ** -5))
-     * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582)
-     + 9.88633994599 * 0.1
+      * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582)
+      + 9.88633994599 * 0.1
   }
   else {
     return 0
@@ -361,15 +361,14 @@ function getDamageMultTuple(build) {
   // Ideally, the Poisoned effect and gas should be damaging the enemy at all times
   // Gas ignited from Fire magic makes an explosion that causes damage (untested), but halves the tick rate of damage (1 second per tick to 2 seconds per tick) and halves the duration of clouds
   // Gas ignited from Plasma magic doubles the tick rate of damage (1 second per tick to 0.5 seconds per tick) and halves the duration of clouds
-  let gasDamage = GAS_DAMAGE * (1 + 1 * usePlasma - 0.5 * useFire)
 
   // Should be average damage per second (Damage from Blast spells per second + Poisoned damage per second + Gas damage per second)
   let defaultDamage = BASE_ATTACK * DAMAGE_AFFINITY * 0.5
     + Math.floor(BASE_ATTACK * DAMAGE_AFFINITY * 0.05)
-    + gasDamage
-  let actualDamage = (BASE_ATTACK + build.power()) * DAMAGE_AFFINITY * (0.5 * secondaryMult(build.speed())) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500)
-    + Math.floor((BASE_ATTACK + build.power()) * DAMAGE_AFFINITY * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) * 0.05)
-    + gasDamage
+    + GAS_DAMAGE
+  let actualDamage = (BASE_ATTACK + build.power()) * DAMAGE_AFFINITY * (0.5 * secondaryMult(build.speed())) * (1 + 0.1 * use10Percent) * (1 - build.vit / 500)
+    + Math.floor((BASE_ATTACK + build.power()) * DAMAGE_AFFINITY * (1 + 0.1 * use10Percent) * (1 - build.vit / 500) * 0.05)
+    + GAS_DAMAGE * (1 + 1 * usePlasma - 0.5 * useFire)
   return [actualDamage, defaultDamage]
 }
 
