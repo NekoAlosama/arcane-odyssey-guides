@@ -194,7 +194,7 @@ class Build {
     this.jewelSlots = armorList.reduce((sum, armor) => sum + armor.jewelSlots, 0);
     this.hash = getHash(this.stats);
     // this.statCode = getStatCode(stats);
-    this.multiplier = getMult(this) // + getExtraTotalStats(this) / (BASE_ATTACK / 2 + BASE_HEALTH / Ratio[1] / 2);
+    this.multiplier = getMult(this) + getExtraTotalStats(this) / ((BASE_ATTACK / 0.75) / 2 + BASE_HEALTH / Ratio[1] / 2);
   }
 
   value() {
