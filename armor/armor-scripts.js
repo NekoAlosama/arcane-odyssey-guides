@@ -295,9 +295,9 @@ class Build {
   asHTML() {
     return `
       <div class="list-element">
-        <div title="Multiplier of all stats except Attack Size and Agility">Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</span></div>
-        <div title="Power needed, assuming 0 Attack Speed">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</span></div>
-        <div title="Defense needed, assuming 0 Intensity on Resistance Aura">Effective Defense: ${getFormattedMultiplierStr(getEffectivePower(this))}</span></div>
+        <div title="Multiplier of all stats except Attack Size and Agility">Multiplier: ${getFormattedMultiplierStr(this.multiplier)}</div>
+        <div title="Power needed, assuming 0 Attack Speed">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
+        <div title="Defense needed, assuming 0 Intensity on Resistance Aura">Effective Defense: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
         <div>${StatOrder.map(stat => this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
         <div class="br-small"></div>
         <table>
