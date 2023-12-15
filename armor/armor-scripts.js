@@ -128,6 +128,9 @@ const HEALTH_PER_VIT = 4;
 // ^ Might just be `floor(level / 10) + 4`
 const GAS_DAMAGE = 16
 
+// 3% of max HP is removed per point of Drawback when using JUST BLAST
+const DRAWBACK_PERCENT = 0.03
+
 // Stat order: power defense size intensity speed agility
 
 // Tracking
@@ -379,9 +382,11 @@ function getHealthMultTuple(build) {
 
   // Aura's default cooldown of ~40 seconds is reduced with Intensity, but the Aura is always 25 seconds
   // The following should be the average health of the player over the total cooldown of Aura
-  let defaultHealth = (BASE_HEALTH * (25 * RESISTANCE_AURA + 15)) / 40
+  let defaultHealth = (BASE_HEALTH * 1.01 * (25 * RESISTANCE_AURA + 15)) / 40
   let actualHealth = ((BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense())
-    * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity())) + Math.max((40 / secondaryMult(build.intensity())) - 25, 0))) / Math.max(40 / secondaryMult(build.intensity()), 25)
+    * (25 * (1.01 * RESISTANCE_AURA * secondaryMult(build.intensity()) - 0.5 * secondaryMult(build.speed()) * DRAWBACK_PERCENT * build.drawback())
+      + Math.max((40 / secondaryMult(build.intensity())) - 25, 0) * (1.01 - 0.5 * secondaryMult(build.speed()) * DRAWBACK_PERCENT * build.drawback())))
+    / Math.max(40 / secondaryMult(build.intensity()), 25)
   return [actualHealth, defaultHealth]
 }
 
