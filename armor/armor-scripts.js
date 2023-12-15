@@ -363,7 +363,7 @@ function getDamageMultTuple(build) {
   // Should be average damage per second (Damage from Blast spells per second + Poisoned damage per second + Gas damage per second)
   let defaultDamage = BASE_ATTACK * 0.5 + Math.floor(BASE_ATTACK * 0.05) + gasDamage
   let actualDamage = (BASE_ATTACK + build.power) * (0.5 * secondaryMult(build.speed)) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) + Math.floor((BASE_ATTACK + build.power) * (use10Percent ? 1.1 : 1) * (1 - build.vit / 500) * 0.05) + gasDamage
-  return (actualDamage, defaultDamage)
+  return [actualDamage, defaultDamage]
 }
 
 // Resistance Aura multiplies secondaryMult(build.intensity) by about 2326/2009 (using Resistance Aura with 2009 HP and 0 Intensity)
@@ -376,7 +376,7 @@ function getHealthMultTuple(build) {
   // The following should be the average health of the player over the total cooldown of Aura
   let defaultHealth = (BASE_HEALTH * (25 * RESISTANCE_AURA + 15)) / 40
   let actualHealth = (BASE_HEALTH + HEALTH_PER_VIT * build.vit + build.defense) * (25 * (RESISTANCE_AURA * secondaryMult(build.intensity)) + Math.max(40 / secondaryMult(build.intensity) - 25, 0)) / Math.max(40 / secondaryMult(build.intensity), 25)
-  return (actualHealth, defaultHealth)
+  return [actualHealth, defaultHealth]
 }
 
 // Returns true multiplier, given Vitality, Power, Defense, Intensity, and Attack Speed
