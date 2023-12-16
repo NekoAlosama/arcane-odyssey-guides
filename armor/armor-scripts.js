@@ -291,11 +291,11 @@ class Build {
   asHTML() {
     return `
       <div class="list-element">
-      <div title="List sorted by this: Multiplier of all stats except Attack Size and Agility">Lower Bound: ${getFormattedMultiplierStr(this.multiplier)}</div>
-      <div title="Multiplier of all stats including Attack Size and Agility">Upper Bound: ${getFormattedMultiplierStr(this.multiplier * secondaryMult(this.agility()) * secondaryMult(this.size()))}</div>
-      <div title="Multiplier of all stats including Attack Size and Agility with reduced effect">Mean Bound: ${getFormattedMultiplierStr(this.multiplier * (secondaryMult(this.agility()) * secondaryMult(this.size())) ** 0.5)}</div>
-        <div title="Equivalent amount of Power given no other stats">Effective Power: ${getFormattedMultiplierStr(getEffectivePower(this))}</div>
-        <div title="Equivalent amount of Defense given no other stats">Effective Defense: ${getFormattedMultiplierStr(getEffectiveDefense(this))}</div>
+      <div title="List sorted by this: Multiplier of all stats except Attack Size and Agility">Lower Bound: ${this.multiplier.toFixed(4)}</div>
+      <div title="Multiplier of all stats including Attack Size and Agility">Upper Bound: ${(this.multiplier * secondaryMult(this.agility()) * secondaryMult(this.size())).toFixed(4)}</div>
+      <div title="Multiplier of all stats including Attack Size and Agility with reduced effect">Mean Bound: ${(this.multiplier * (secondaryMult(this.agility()) * secondaryMult(this.size())) ** 0.5).toFixed(4)}</div>
+        <div title="Equivalent amount of Power given no other stats">Effective Power: ${getEffectivePower(this).toFixed(4)}</div>
+        <div title="Equivalent amount of Defense given no other stats">Effective Defense: ${getEffectiveDefense(this).toFixed(4)}</div>
         <div>${StatOrder.map(stat => this[stat]() == 0 ? `` : `<span class="${stat}">${this[stat]()}</span><img class="icon" src="./armor/${stat}_icon.png">`).join(" ")}</div>
         <div class="br-small"></div>
         <table>
@@ -329,11 +329,6 @@ function getHash(stats) {
 // Return a BigInt that represents the build's stats
 function getStatCode(stats) {
   return stats.reduce((acc, val, i) => acc * absMaxStats[i] + BigInt(val), 0n);
-}
-
-function getFormattedMultiplierStr(mult) {
-  const tens = 10 ** 4;
-  return `${Math.floor(mult)}.${(Math.floor(mult * tens) % tens).toString().padStart(4, "0")}`;
 }
 
 // Effect interpolation for Attack Speed and Intensity
