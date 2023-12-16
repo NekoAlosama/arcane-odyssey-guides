@@ -379,7 +379,7 @@ function getHealthMultTuple(build) {
   // Affected by Vitality, Defense, and Intensity (Resistance Aura only, for now)
 
   // Total health reduction due to Drawback and how many times we can Blast per second
-  let drawbackReduction = (1 - 0.01 * build.drawback()) ** (0.5 * build.speed())
+  let drawbackReduction = (1 - 0.01 * build.drawback()) ** (0.5 * secondaryMult(build.speed()))
 
   // Aura's default cooldown of ~40 seconds is reduced with Intensity, but the Aura is always 25 seconds
   // The following should be the average health of the player over the total cooldown of Aura
