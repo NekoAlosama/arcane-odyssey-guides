@@ -337,9 +337,12 @@ function secondaryMult(stat) {
   if (-0.5 < stat && stat < 0.5) {
     return 1
   } else if (0.5 < stat && stat < 272.5) {
-    return (2.24047567137 * (10 ** -5))
-      * (Math.log(stat + 3.35466794034 * 10) ** 5.2537137582)
-      + 9.88633994599 * 0.1
+    // R^2 = 0.99998256727
+    // Well-behaved between 1 and 272: positive first derivative, negative second derivative
+    return 1.00471635071
+      + 7.97116190984e-4 * stat
+      - 1.4823560146e-7 * stat ** 2
+      - 4.0491295858e-10 * stat ** 3
   } else {
     return 0
   }
