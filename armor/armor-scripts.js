@@ -343,7 +343,7 @@ function secondaryMult(stat) {
       + 5.6343068464e-7 * stat ** 2
       - 1.7584940282e-9 * stat ** 3)
   } else {
-    return 0
+    return -Infinity
   }
 }
 
